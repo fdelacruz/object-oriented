@@ -6,41 +6,40 @@ var oojs = (function(oojs) {
 		[].forEach.call(itemElements, function(el, index, array) {
 
 			var item = {
-				el: el,
-				disable: function() {
-					this.el.classList.add('disabled');
-				},
-				enable: function() {
-					this.el.classList.remove('disabled');
-				},
-				isDisabled: function() {
-					return this.el.classList.contains('disabled');
-				},
-				activate: function() {
-					if (this.isDisabled()) {
-						return;
-					}
-
-					this.el.classList.add('active');
-				},
-				deactivate: function() {
-					if (this.isDisabled()) {
-						return;
-					}
-
-					this.el.classList.remove('active');
-				},
-				isActive: function () {
-					return this.el.classList.contains('active');
-				},
 				toggleActiveState: function() {
-					if (this.isActive()) {
-						this.deactivate();
-					} else {
-						this.activate();
-					}
+					this.activated = !this.activated;
 				}
 			};
+
+			Object.defineProperties(item, {
+				el: {
+					value: el
+				},
+				enabled: {
+					get: function() {
+						return !this.el.classList.contains('disabled');
+					},
+					set: function(value) {
+						if (value) {
+							this.el.classList.remove('disabled');
+						} else {
+							this.el.classList.add('disabled');
+						}
+					}
+				},
+				activated: {
+					get: function() {
+						return this.el.classList.contains('active');
+					},
+					set: function(value) {
+						if (value) {
+							this.el.classList.add('active');
+						} else {
+							this.el.classList.remove('active');
+						}
+					}
+				}
+			});
 
 			items.push(item);
 		});
@@ -62,9 +61,8 @@ var oojs = (function(oojs) {
 
 
 // var toolbar = oojs.createToolbar('myToolbar')
-// toolbar.items[0].disable()
-// toolbar.items[0].isDisabled()
-// toolbar.items[0].enable()
-// toolbar.items[0].activate()
-// toolbar.items[0].deactivate()
+// toolbar.items[0].enabled = false
+// toolbar.items[0].enabled = true
+// toolbar.items[0].activated = true
+// toolbar.items[0].activated = false
 // toolbar.items[0].toggleActiveState()
