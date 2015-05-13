@@ -1,124 +1,45 @@
-var oojs = (function(oojs) {
-
-	var createToolbarItem = function (itemElement) {
-		var item = {
-			toggleActiveState: function() {
-				this.activated = !this.activated;
-			}
-		};
-
-		Object.defineProperties(item, {
-			el: {
-				value: itemElement
-			},
-			enabled: {
-				get: function() {
-					return !this.el.classList.contains('disabled');
-				},
-				set: function(value) {
-					if (value) {
-						this.el.classList.remove('disabled');
-					} else {
-						this.el.classList.add('disabled');
-					}
-				}
-			},
-			activated: {
-				get: function() {
-					return this.el.classList.contains('active');
-				},
-				set: function(value) {
-					if (value) {
-						this.el.classList.add('active');
-					} else {
-						this.el.classList.remove('active');
-					}
-				}
-			}
-		});
-
-		return item;
+var createPerson = function(firstname, lastname) {
+	var person = {
+		firstname: firstname,
+		lastname: lastname
 	};
 
-	var createToolbarItems = function(itemElements) {
-		var items = [];
+	Object.defineProperty(person, 'fullname', {
+		get: function() {
+			return this.firstname + ' ' + this.lastname;
+		},
+		enumerable: true,
+		configurable: true
+	});
 
-		[].forEach.call(itemElements, function(el, index, array) {
-			var item = createToolbarItem(el);
+	return person;
+};
 
-			items.push(item);
-		});
+// Parasitic Inheritance
+var createEmployee = function (firstname, lastname, position) {
+	var person = createPerson(firstname, lastname);
 
-		return items;
-	};
+	person.position = position;
 
-	oojs.createToolbar = function(elementId) {
-		var element = document.getElementById(elementId);
+	// Overriging Members
+	var fullname = Object.getOwnPropertyDescriptor(person, 'fullname');
 
-		if (!element) {
-			element = document.createElement("DIV");
-			element.id = elementId;
-			element.className = "toolbar";
-		}
+	var fullNameFunction = fullname.get.bind(person);
+	
+	Object.defineProperty(person, 'fullname', {
+		get: function() {
+			return fullNameFunction() + ', ' + this.position;
+		},
+		enumerable: true,
+		configurable: true
+	});
 
-		var items = element.querySelectorAll('.toolbar-item');
+	return person;
+};
 
-		var toolbar = {
-			add: function (options) {
-				var span = document.createElement("SPAN");
-				span.className = "toolbar-item";
-
-				this.el.appendChild(span);
-
-				var item = createToolbarItem(span);
-
-				this.items.push(item);
-			},
-			remove: function (index) {
-				var len = this.items.length;
-
-				if (index > len || index < 0) {
-					throw new Error("Index is out of range");
-				}
-
-				var item = this.items[index];
-				this.items.splice(index, 1);
-
-				this.el.removeChild(item.el);
-
-				item = null;
-			},
-			appendTo: function (parentElement) {
-				parentElement.appendChild(this.el);
-			}
-		};
-
-		Object.defineProperties(toolbar, {
-			el: {
-				value: element
-			},
-			items: {
-				value: createToolbarItems(items),
-				enumerable : true
-			}
-		});
-
-		return toolbar;
-	};
-
-	return oojs;
-}(oojs || {}));
+var johnDoe = createEmployee('John', 'Doe', 'Manager');
 
 
-// var toolbar = oojs.createToolbar('myToolbar')
-// toolbar.add()
-// toolbar.remove(1)
-// toolbar.items[0].enabled = false
-// toolbar.items[0].enabled = true
-// toolbar.items[0].activated = true
-// toolbar.items[0].activated = false
-// var toolbar1 = oojs.createToolbar('foo')
-// toolbar1.appendTo(document.body)
-// toolbar1.add()
-// toolbar1.remove(0)
-
+// johnDoe.fullname -> 'John Doe, Manager'
+// johnDoe.firstname = 'Jane'
+// johnDoe.fullname -> 'Jane Doe, Manager'
