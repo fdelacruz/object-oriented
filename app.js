@@ -1,7 +1,10 @@
 var createPerson = function(firstname, lastname) {
 	var person = {
 		firstname: firstname,
-		lastname: lastname
+		lastname: lastname,
+		sayHello: function() {
+			return 'Hi, there.';
+		}
 	};
 
 	Object.defineProperty(person, 'fullname', {
@@ -34,6 +37,12 @@ var createEmployee = function (firstname, lastname, position) {
 		configurable: true
 	});
 
+	var sayHelloFn = person.sayHello.bind(person);
+
+	person.sayHello = function() {
+		return sayHelloFn() + ' My name is ' + this.fullname;
+	};
+
 	return person;
 };
 
@@ -43,3 +52,4 @@ var johnDoe = createEmployee('John', 'Doe', 'Manager');
 // johnDoe.fullname -> 'John Doe, Manager'
 // johnDoe.firstname = 'Jane'
 // johnDoe.fullname -> 'Jane Doe, Manager'
+// johnDoe.sayHello() -> 'Hi, there. My name is John Doe, Manager'
