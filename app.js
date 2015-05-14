@@ -1,55 +1,22 @@
-var createPerson = function(firstname, lastname) {
-	var person = {
-		firstname: firstname,
-		lastname: lastname,
-		sayHello: function() {
-			return 'Hi, there.';
-		}
-	};
+var Person = function(firstName, lastName) {
+	this.firstName = firstName;
+	this.lastName = lastName;
 
-	Object.defineProperty(person, 'fullname', {
-		get: function() {
-			return this.firstname + ' ' + this.lastname;
-		},
-		enumerable: true,
-		configurable: true
-	});
-
-	return person;
 };
 
-// Parasitic Inheritance
-var createEmployee = function (firstname, lastname, position) {
-	var person = createPerson(firstname, lastname);
-
-	person.position = position;
-
-	// Overriging Members
-	var fullname = Object.getOwnPropertyDescriptor(person, 'fullname');
-
-	var fullNameFunction = fullname.get.bind(person);
-	
-	Object.defineProperty(person, 'fullname', {
-		get: function() {
-			return fullNameFunction() + ', ' + this.position;
+Object.defineProperties(Person.prototype, {
+	sayHi: {
+		value: function() {
+			return "Hi there";
 		},
-		enumerable: true,
-		configurable: true
-	});
+		enumerable: true
+	},
+	fullName: {
+		get: function() {
+			return this.firstName + " " + this.lastName;
+		},
+		enumerable: true
+	}
+});
 
-	var sayHelloFn = person.sayHello.bind(person);
-
-	person.sayHello = function() {
-		return sayHelloFn() + ' My name is ' + this.fullname;
-	};
-
-	return person;
-};
-
-var johnDoe = createEmployee('John', 'Doe', 'Manager');
-
-
-// johnDoe.fullname -> 'John Doe, Manager'
-// johnDoe.firstname = 'Jane'
-// johnDoe.fullname -> 'Jane Doe, Manager'
-// johnDoe.sayHello() -> 'Hi, there. My name is John Doe, Manager'
+var johnDoe = new Person("John", "Doe");
